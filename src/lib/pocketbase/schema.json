@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T19:18:32.589Z",
+  "generatedAt": "2026-07-27T19:22:06.469Z",
   "collections": [
     {
       "name": "users",
@@ -29,25 +29,411 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": [
         "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
         "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
       ]
+    },
+    {
+      "name": "contents",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["video", "photo", "carousel"]
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube_shorts"]
+        },
+        {
+          "name": "views",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "likes",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comments",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "shares",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "retention_rate",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "hook_rate",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "watch_time_sec",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "duration_sec",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "posting_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "viral_score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["viral", "standard", "flop"]
+        },
+        {
+          "name": "hook_text",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tags",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_contents_user ON contents (user_id)",
+        "CREATE INDEX idx_contents_status ON contents (status)"
+      ]
+    },
+    {
+      "name": "analyses",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "content_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "contents"
+        },
+        {
+          "name": "compared_content_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "contents"
+        },
+        {
+          "name": "summary",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "positive_factors",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "negative_factors",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "engagement_diagnosis",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "virality_score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_analyses_user ON analyses (user_id)"]
+    },
+    {
+      "name": "scripts",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "topic",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube_shorts"]
+        },
+        {
+          "name": "format",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["video", "photo", "carousel"]
+        },
+        {
+          "name": "hook_headline",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "body_outline",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "visual_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estimated_duration",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "viral_potential_score",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["draft", "approved", "produced"]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_scripts_user ON scripts (user_id)"]
+    },
+    {
+      "name": "content_ideas",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "format",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "reasoning",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "hook_examples",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_ideas_user ON content_ideas (user_id)"]
     }
   ]
 }

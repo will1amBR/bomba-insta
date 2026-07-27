@@ -82,14 +82,21 @@ export function Header() {
               </Button>
             </div>
           ) : (
-            <Link to="/auth">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90"
-              >
-                Entrar
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-xs font-semibold">
+                  Entrar
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-primary to-violet-600 text-white hover:opacity-90 text-xs font-semibold"
+                >
+                  Criar Conta
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </div>

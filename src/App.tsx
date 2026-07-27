@@ -1,10 +1,11 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import Layout from './components/Layout'
+import { HomeRoute } from '@/components/HomeRoute'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
 
-import Dashboard from './pages/Dashboard'
 import Analysis from './pages/Analysis'
 import ScriptGenerator from './pages/ScriptGenerator'
 import ScriptsLibrary from './pages/ScriptsLibrary'
@@ -13,7 +14,8 @@ import SocialSnapshot from './pages/SocialSnapshot'
 import Competitors from './pages/Competitors'
 import CompetitorDetail from './pages/CompetitorDetail'
 import ActionPlanPage from './pages/ActionPlanPage'
-import Auth from './pages/Auth'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -23,16 +25,20 @@ const App = () => (
       <Sonner />
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/analise" element={<Analysis />} />
-          <Route path="/roteiros" element={<ScriptGenerator />} />
-          <Route path="/biblioteca" element={<ScriptsLibrary />} />
-          <Route path="/chat" element={<AiStrategist />} />
-          <Route path="/snapshot" element={<SocialSnapshot />} />
-          <Route path="/concorrentes" element={<Competitors />} />
-          <Route path="/concorrentes/:id" element={<CompetitorDetail />} />
-          <Route path="/plano" element={<ActionPlanPage />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<HomeRoute />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/auth" element={<Navigate to="/login" replace />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/analise" element={<Analysis />} />
+            <Route path="/roteiros" element={<ScriptGenerator />} />
+            <Route path="/biblioteca" element={<ScriptsLibrary />} />
+            <Route path="/chat" element={<AiStrategist />} />
+            <Route path="/snapshot" element={<SocialSnapshot />} />
+            <Route path="/concorrentes" element={<Competitors />} />
+            <Route path="/concorrentes/:id" element={<CompetitorDetail />} />
+            <Route path="/plano" element={<ActionPlanPage />} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

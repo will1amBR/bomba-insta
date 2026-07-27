@@ -20,6 +20,7 @@ import {
 import { useRealtime } from '@/hooks/use-realtime'
 import { Flame, TrendingUp, Sparkles, Zap, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { TrialBanner } from '@/components/TrialBanner'
 
 export default function Dashboard() {
   const [contents, setContents] = useState<ContentRecord[]>([])
@@ -82,6 +83,7 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto py-6 px-4 space-y-6">
+      <TrialBanner />
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">

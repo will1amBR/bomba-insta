@@ -49,6 +49,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .collection('users')
         .create({ email, password, passwordConfirm: password, name: 'Criador de Conteúdo' })
       await pb.collection('users').authWithPassword(email, password)
+
+      const leadToken = localStorage.getItem('lead_token')
+      if (leadToken) {
+        try {
+          await pb.send('/backend/v1/leads/link', {
+            method: 'POST',
+            body: JSON.stringify({ lead_token: leadToken }),
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch {
+          /* intentionally ignored */
+        }
+        localStorage.removeItem('lead_token')
+      }
+
       return { error: null }
     } catch (error) {
       return { error }

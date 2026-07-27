@@ -7,14 +7,19 @@ routerAdd('POST', '/backend/v1/leads', (e) => {
   if (!Array.isArray(links)) return e.badRequestError('links deve ser uma lista')
   if (links.length > 5) return e.badRequestError('máximo de 5 links')
 
-  const leadsCol = $app.findCollectionByNameOrId('leads')
-  const record = new Record(leadsCol)
-  record.set('handle', handle)
-  record.set('links', JSON.stringify(links))
-  $app.save(record)
+  let lead
+  try {
+    lead = $app.findFirstRecordByData('leads', 'handle', handle)
+  } catch (_) {
+    const leadsCol = $app.findCollectionByNameOrId('leads')
+    lead = new Record(leadsCol)
+    lead.set('handle', handle)
+    lead.set('links', JSON.stringify(links))
+    $app.save(lead)
+  }
 
   return e.json(200, {
-    id: record.id,
+    id: lead.id,
     handle: handle,
     preview: {
       title: '🔍 Analisamos seus links e identificamos padrões promissores!',

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getContents } from '@/services/contents'
 import { runAiAnalysis } from '@/services/analyses'
+import { generateActionPlan } from '@/services/action-plans'
 import type { ContentRecord } from '@/types/content'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -55,6 +56,12 @@ export default function Analysis() {
         title: 'Diagnóstico Concluído!',
         description: 'Fatores de viralização identificados.',
       })
+      try {
+        await generateActionPlan(res.id)
+        toast({ title: 'Plano de Ação gerado! 🎯', description: 'Confira na aba Plano de Ação!' })
+      } catch {
+        /* intentionally ignored */
+      }
     } catch (err) {
       toast({
         title: 'Erro ao analisar',

@@ -9,6 +9,10 @@ import Analysis from './pages/Analysis'
 import ScriptGenerator from './pages/ScriptGenerator'
 import ScriptsLibrary from './pages/ScriptsLibrary'
 import AiStrategist from './pages/AiStrategist'
+import SocialSnapshot from './pages/SocialSnapshot'
+import Competitors from './pages/Competitors'
+import CompetitorDetail from './pages/CompetitorDetail'
+import ActionPlanPage from './pages/ActionPlanPage'
 import Auth from './pages/Auth'
 import NotFound from './pages/NotFound'
 
@@ -24,6 +28,10 @@ const App = () => (
           <Route path="/roteiros" element={<ScriptGenerator />} />
           <Route path="/biblioteca" element={<ScriptsLibrary />} />
           <Route path="/chat" element={<AiStrategist />} />
+          <Route path="/snapshot" element={<SocialSnapshot />} />
+          <Route path="/concorrentes" element={<Competitors />} />
+          <Route path="/concorrentes/:id" element={<CompetitorDetail />} />
+          <Route path="/plano" element={<ActionPlanPage />} />
           <Route path="/auth" element={<Auth />} />
         </Route>
         <Route path="*" element={<NotFound />} />

@@ -65,3 +65,87 @@ export interface ContentIdea {
   hook_examples: string[]
   created: string
 }
+
+export interface PlatformSummary {
+  platform: string
+  total_posts: number
+  avg_views: number
+  avg_likes: number
+  avg_comments: number
+  avg_shares: number
+  best_posting_time: string
+}
+
+export interface PlatformRanking {
+  platform: string
+  reach: number
+  position: number
+}
+
+export interface SocialSnapshotRecord {
+  id: string
+  user_id: string
+  snapshot_date: string
+  platforms_summary: PlatformSummary[]
+  ranking: PlatformRanking[]
+  gaps: string
+  created: string
+  updated: string
+}
+
+export interface ActionPlanGoal {
+  id: string
+  title: string
+  description: string
+  status: 'completed' | 'in_progress' | 'pending'
+  target: string
+}
+
+export interface CalendarEntry {
+  day: string
+  time: string
+  platform: string
+  content_type: string
+}
+
+export interface ChecklistItem {
+  id: string
+  text: string
+  done: boolean
+}
+
+export interface ActionPlanRecord {
+  id: string
+  user_id: string
+  summary: string
+  goals: ActionPlanGoal[]
+  posting_calendar: CalendarEntry[]
+  checklist: ChecklistItem[]
+  progress: number
+  created: string
+  updated: string
+}
+
+export interface CompetitorRecord {
+  id: string
+  user_id: string
+  channel_name: string
+  handle: string
+  platform: ContentPlatform
+  niche: string
+  notes: string
+  created: string
+  updated: string
+}
+
+export interface CompetitorInsightRecord {
+  id: string
+  user_id: string
+  competitor_id: string
+  summary: string
+  best_hooks: string[]
+  formats: string[]
+  suggested_ideas: string[]
+  created: string
+  updated: string
+}

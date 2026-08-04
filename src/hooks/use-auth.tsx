@@ -4,7 +4,7 @@ import pb from '@/lib/pocketbase/client'
 interface AuthContextType {
   user: any
   isAuthenticated: boolean
-  signUp: (email: string, password: string) => Promise<{ error: any }>
+  signUp: (email: string, password: string, role?: string) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => void
   loading: boolean
@@ -43,11 +43,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, role?: string) => {
     try {
-      await pb
-        .collection('users')
-        .create({ email, password, passwordConfirm: password, name: 'Criador de Conteúdo' })
+      await pb.collection('users').create({
+        email,
+        password,
+        passwordConfirm: password,
+        name: role === 'agency' ? 'Agência' : 'Criador de Conteúdo',
+        role: role || 'creator',
+      })
       await pb.collection('users').authWithPassword(email, password)
 
       const leadToken = localStorage.getItem('lead_token')

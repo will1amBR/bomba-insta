@@ -14,6 +14,9 @@ import SocialSnapshot from './pages/SocialSnapshot'
 import Competitors from './pages/Competitors'
 import CompetitorDetail from './pages/CompetitorDetail'
 import ActionPlanPage from './pages/ActionPlanPage'
+import ClientPortal from './pages/ClientPortal'
+import AgencyDashboard from './pages/AgencyDashboard'
+import AgencyClientDetail from './pages/AgencyClientDetail'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import NotFound from './pages/NotFound'
@@ -38,6 +41,9 @@ const App = () => (
             <Route path="/concorrentes" element={<Competitors />} />
             <Route path="/concorrentes/:id" element={<CompetitorDetail />} />
             <Route path="/plano" element={<ActionPlanPage />} />
+            <Route path="/portal" element={<ClientPortal />} />
+            <Route path="/agencia" element={<AgencyDashboard />} />
+            <Route path="/agencia/clientes/:id" element={<AgencyClientDetail />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

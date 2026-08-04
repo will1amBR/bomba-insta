@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/hooks/use-toast'
-import { Flame, Lock, Mail, ArrowRight, Gift } from 'lucide-react'
+import { Flame, Lock, Mail, ArrowRight, Gift, Mic, Building2 } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Signup() {
@@ -15,6 +15,7 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [terms, setTerms] = useState(false)
+  const [role, setRole] = useState<'creator' | 'agency'>('creator')
   const [loading, setLoading] = useState(false)
 
   if (isAuthenticated) {
@@ -33,7 +34,7 @@ export default function Signup() {
     }
     setLoading(true)
     try {
-      const res = await signUp(email, password)
+      const res = await signUp(email, password, role)
       if (res.error) {
         toast({
           title: 'Falha no Cadastro',
@@ -65,6 +66,32 @@ export default function Signup() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setRole('creator')}
+                className={`p-3 rounded-lg border-2 text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+                  role === 'creator'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-border text-muted-foreground'
+                }`}
+              >
+                <Mic className="w-4 h-4" />
+                Sou Criador
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('agency')}
+                className={`p-3 rounded-lg border-2 text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+                  role === 'agency'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-border text-muted-foreground'
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                Sou Agência
+              </button>
+            </div>
             <div>
               <Label htmlFor="email">E-mail</Label>
               <div className="relative mt-1">

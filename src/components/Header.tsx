@@ -12,22 +12,28 @@ import {
   Crosshair,
   LogOut,
   User,
+  Users,
+  Inbox,
 } from 'lucide-react'
 
 export function Header() {
   const location = useLocation()
   const { user, signOut, isAuthenticated } = useAuth()
 
-  const navItems = [
-    { label: 'Início', path: '/', icon: BarChart3 },
-    { label: 'Snapshot', path: '/snapshot', icon: Camera },
-    { label: 'Análise', path: '/analise', icon: Flame },
-    { label: 'Roteiros', path: '/roteiros', icon: Sparkles },
-    { label: 'Biblioteca', path: '/biblioteca', icon: Lightbulb },
-    { label: 'Concorrentes', path: '/concorrentes', icon: Crosshair },
-    { label: 'Plano', path: '/plano', icon: Target },
-    { label: 'IA', path: '/chat', icon: MessageSquare },
-  ]
+  const isAgency = user?.role === 'agency'
+  const navItems = isAgency
+    ? [{ label: 'Agência', path: '/agencia', icon: Users }]
+    : [
+        { label: 'Início', path: '/', icon: BarChart3 },
+        { label: 'Snapshot', path: '/snapshot', icon: Camera },
+        { label: 'Análise', path: '/analise', icon: Flame },
+        { label: 'Roteiros', path: '/roteiros', icon: Sparkles },
+        { label: 'Biblioteca', path: '/biblioteca', icon: Lightbulb },
+        { label: 'Concorrentes', path: '/concorrentes', icon: Crosshair },
+        { label: 'Plano', path: '/plano', icon: Target },
+        { label: 'Portal', path: '/portal', icon: Inbox },
+        { label: 'IA', path: '/chat', icon: MessageSquare },
+      ]
 
   return (
     <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">

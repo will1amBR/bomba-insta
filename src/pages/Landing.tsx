@@ -15,6 +15,7 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react'
+import { SmartHandleInput } from '@/components/SmartHandleInput'
 
 export default function Landing() {
   const [handle, setHandle] = useState('')
@@ -122,17 +123,17 @@ export default function Landing() {
         <CardContent className="pt-6 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="text-sm font-semibold">Seu @ (handle)</label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-3 text-muted-foreground text-sm">@</span>
-                <Input
-                  type="text"
-                  placeholder="seuusuario"
+              <label className="text-sm font-semibold">Seu @ (handle) ou link</label>
+              <div className="mt-1">
+                <SmartHandleInput
                   value={handle}
-                  onChange={(e) => setHandle(e.target.value)}
-                  className="pl-7"
+                  onChange={(val) => setHandle(val)}
+                  placeholder="@seuusuario ou cole o link"
                 />
               </div>
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Detectamos a plataforma automaticamente! 🪄
+              </p>
             </div>
 
             <div>

@@ -149,3 +149,38 @@ export interface CompetitorInsightRecord {
   created: string
   updated: string
 }
+
+export type BriefingStatus = 'draft' | 'sent' | 'in_progress' | 'delivered' | 'approved'
+export type DeliverableStatus = 'pending' | 'submitted' | 'approved' | 'rejected'
+
+export interface BriefingRecord {
+  id: string
+  agency_id: string
+  influencer_id: string
+  title: string
+  description?: string
+  platform: ContentPlatform
+  content_type?: ContentType
+  hook?: string
+  cta?: string
+  visual_notes?: string
+  status: BriefingStatus
+  due_date?: string
+  created: string
+  updated: string
+  expand?: { influencer_id?: any; agency_id?: any }
+}
+
+export interface DeliverableRecord {
+  id: string
+  influencer_id: string
+  agency_id: string
+  briefing_id: string
+  title: string
+  link?: string
+  status: DeliverableStatus
+  feedback?: string
+  created: string
+  updated: string
+  expand?: { briefing_id?: BriefingRecord }
+}

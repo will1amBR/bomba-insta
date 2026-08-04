@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T20:20:46.069Z",
+  "generatedAt": "2026-08-04T13:46:20.981Z",
   "collections": [
     {
       "name": "users",
@@ -43,6 +43,13 @@
           "type": "date",
           "required": false,
           "system": false
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["creator", "agency"]
         }
       ],
       "indexes": [
@@ -743,6 +750,185 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_leads_user ON leads (user_id)"]
+    },
+    {
+      "name": "briefings",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && (agency_id = @request.auth.id || influencer_id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (agency_id = @request.auth.id || influencer_id = @request.auth.id)",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && (agency_id = @request.auth.id || influencer_id = @request.auth.id)",
+        "delete": "@request.auth.id != '' && agency_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "agency_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "influencer_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube_shorts"]
+        },
+        {
+          "name": "content_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["video", "photo", "carousel"]
+        },
+        {
+          "name": "hook",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cta",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "visual_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["draft", "sent", "in_progress", "delivered", "approved"]
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_briefings_agency ON briefings (agency_id)",
+        "CREATE INDEX idx_briefings_influencer ON briefings (influencer_id)"
+      ]
+    },
+    {
+      "name": "deliverables",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && (influencer_id = @request.auth.id || agency_id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (influencer_id = @request.auth.id || agency_id = @request.auth.id)",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && (influencer_id = @request.auth.id || agency_id = @request.auth.id)",
+        "delete": "@request.auth.id != '' && (influencer_id = @request.auth.id || agency_id = @request.auth.id)"
+      },
+      "fields": [
+        {
+          "name": "influencer_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "agency_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "briefing_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "briefings"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["pending", "submitted", "approved", "rejected"]
+        },
+        {
+          "name": "feedback",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_deliverables_influencer ON deliverables (influencer_id)",
+        "CREATE INDEX idx_deliverables_briefing ON deliverables (briefing_id)"
+      ]
     }
   ]
 }

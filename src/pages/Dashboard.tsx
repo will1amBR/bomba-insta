@@ -21,6 +21,7 @@ import { useRealtime } from '@/hooks/use-realtime'
 import { Flame, TrendingUp, Sparkles, Zap, RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { TrialBanner } from '@/components/TrialBanner'
+import { SocialAccountsConnector } from '@/components/SocialAccountsConnector'
 
 export default function Dashboard() {
   const [contents, setContents] = useState<ContentRecord[]>([])
@@ -140,6 +141,9 @@ export default function Dashboard() {
           <span className="text-[10px] text-muted-foreground">Média do canal</span>
         </div>
       </div>
+
+      {/* Real Social API Connection */}
+      <SocialAccountsConnector onUpdate={loadData} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ActionPlanProgress plan={actionPlan} />

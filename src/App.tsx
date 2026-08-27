@@ -17,6 +17,7 @@ import ActionPlanPage from './pages/ActionPlanPage'
 import ClientPortal from './pages/ClientPortal'
 import AgencyDashboard from './pages/AgencyDashboard'
 import AgencyClientDetail from './pages/AgencyClientDetail'
+import PlansPage from './pages/Plans'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import NotFound from './pages/NotFound'
@@ -29,6 +30,8 @@ const App = () => (
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomeRoute />} />
+          <Route path="/plans" element={<PlansPage />} />
+          <Route path="/planos" element={<Navigate to="/plans" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth" element={<Navigate to="/login" replace />} />

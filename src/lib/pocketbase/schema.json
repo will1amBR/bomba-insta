@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T16:38:26.056Z",
+  "generatedAt": "2026-08-27T16:54:41.506Z",
   "collections": [
     {
       "name": "users",
@@ -928,6 +928,300 @@
       "indexes": [
         "CREATE INDEX idx_deliverables_influencer ON deliverables (influencer_id)",
         "CREATE INDEX idx_deliverables_briefing ON deliverables (briefing_id)"
+      ]
+    },
+    {
+      "name": "plans",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": null,
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "interval",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "features",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "trial_days",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "stripe_price_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "mercadopago_plan_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "badge",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "highlight",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_plans_slug ON plans (slug)"]
+    },
+    {
+      "name": "subscriptions",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != '' && user_id = @request.auth.id",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "plan_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "plans"
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["trialing", "active", "past_due", "canceled", "expired", "incomplete"]
+        },
+        {
+          "name": "provider",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["stripe", "mercadopago", "system"]
+        },
+        {
+          "name": "trial_ends_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "current_period_ends_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "stripe_subscription_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "mercadopago_subscription_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "mercadopago_payer_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cancel_at_period_end",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_subscriptions_user ON subscriptions (user_id)",
+        "CREATE INDEX idx_subscriptions_status ON subscriptions (status)"
+      ]
+    },
+    {
+      "name": "social_tokens",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != '' && user_id = @request.auth.id",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube"]
+        },
+        {
+          "name": "platform_user_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "platform_username",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "access_token",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "refresh_token",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "token_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expires_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "profile_picture_url",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metadata",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_social_tokens_user ON social_tokens (user_id)",
+        "CREATE INDEX idx_social_tokens_platform ON social_tokens (platform)"
       ]
     }
   ]

@@ -6,6 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   signUp: (email: string, password: string, role?: string) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
+  signInWith: (provider: string) => Promise<{ error: any }>
   signOut: () => void
   loading: boolean
 }
@@ -83,12 +84,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const signInWith = async (provider: string) => {
+    try {
+      await pb.collection('users').authWithOAuth2({ provider })
+
+      const leadToken = localStorage.getItem('lead_token')
+      if (leadToken) {
+        try {
+          await pb.send('/backend/v1/leads/link', {
+            method: 'POST',
+            body: JSON.stringify({ lead_token: leadToken }),
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch {
+          /* intentionally ignored */
+        }
+        localStorage.removeItem('lead_token')
+      }
+
+      return { error: null }
+    } catch (error) {
+      return { error }
+    }
+  }
+
   const signOut = () => {
     pb.authStore.clear()
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, signUp, signIn, signOut, loading }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, signUp, signIn, signInWith, signOut, loading }}
+    >
       {children}
     </AuthContext.Provider>
   )

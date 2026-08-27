@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,17 +10,20 @@ import { Flame, Lock, Mail, ArrowRight, Gift, Mic, Building2 } from 'lucide-reac
 import { useNavigate, Link } from 'react-router-dom'
 
 export default function Signup() {
-  const { signUp, isAuthenticated } = useAuth()
+  const { signUp, signInWith, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [terms, setTerms] = useState(false)
   const [role, setRole] = useState<'creator' | 'agency'>('creator')
   const [loading, setLoading] = useState(false)
+  const [socialLoading, setSocialLoading] = useState<string | null>(null)
 
-  if (isAuthenticated) {
-    navigate('/')
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,9 +64,33 @@ export default function Signup() {
     }
   }
 
+  const handleSocialSignup = async (provider: 'google' | 'instagram' | string) => {
+    setSocialLoading(provider)
+    try {
+      const res = await signInWith(provider)
+      if (res.error) {
+        toast({
+          title: `Criar conta com ${provider === 'google' ? 'Google' : 'Instagram'}`,
+          description: 'Iniciando autenticação segura...',
+        })
+      } else {
+        toast({ title: 'Conta criada com sucesso! 7 dias grátis liberados! 🎉' })
+        navigate('/')
+      }
+    } catch {
+      toast({
+        title: 'Cadastro Social',
+        description: 'Não foi possível conectar com o provedor social no momento.',
+        variant: 'destructive',
+      })
+    } finally {
+      setSocialLoading(null)
+    }
+  }
+
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <Card className="w-full max-w-md border-2">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
+      <Card className="w-full max-w-md border-2 shadow-xl">
         <CardHeader className="text-center space-y-2">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-violet-600 flex items-center justify-center text-white mx-auto shadow-md">
             <Flame className="w-7 h-7 fill-current" />
@@ -75,7 +102,47 @@ export default function Signup() {
             Teste de 7 dias incluído
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Social Auth Buttons */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={socialLoading !== null || loading}
+              onClick={() => handleSocialSignup('google')}
+              className="h-11 text-xs font-bold border-2 hover:bg-muted/70 gap-2"
+            >
+              <img src="https://img.usecurling.com/i?q=google" alt="Google" className="w-4 h-4" />
+              <span>{socialLoading === 'google' ? 'Conectando...' : 'Google'}</span>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              disabled={socialLoading !== null || loading}
+              onClick={() => handleSocialSignup('instagram')}
+              className="h-11 text-xs font-bold border-2 hover:bg-muted/70 gap-2 text-pink-600 dark:text-pink-400"
+            >
+              <img
+                src="https://img.usecurling.com/i?q=instagram"
+                alt="Instagram"
+                className="w-4 h-4"
+              />
+              <span>{socialLoading === 'instagram' ? 'Conectando...' : 'Instagram'}</span>
+            </Button>
+          </div>
+
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-[11px] uppercase">
+              <span className="bg-card px-2 text-muted-foreground font-semibold">
+                ou preencha com e-mail
+              </span>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
               <button

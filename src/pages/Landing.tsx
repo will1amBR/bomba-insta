@@ -1,11 +1,14 @@
 import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { SmartHandleInput } from '@/components/SmartHandleInput'
 import { parseSmartInput, type DetectedPlatform } from '@/lib/smart-input'
 import { createLead, type LeadPreview } from '@/services/leads'
+import { fetchSocialMetrics } from '@/services/social-tokens'
+import { toast } from '@/hooks/use-toast'
 import {
   Flame,
   Sparkles,
@@ -37,10 +40,13 @@ import {
 
 export default function Landing() {
   const navigate = useNavigate()
+  const { signInWith } = useAuth()
   const [handleInput, setHandleInput] = useState('')
   const [detectedPlatform, setDetectedPlatform] = useState<DetectedPlatform>('instagram')
   const [loading, setLoading] = useState(false)
+  const [socialLoading, setSocialLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [isRealSource, setIsRealSource] = useState(false)
   const [previewData, setPreviewData] = useState<{
     handle: string
     platform: string
@@ -70,6 +76,20 @@ export default function Landing() {
     try {
       const platformToSave = parsed.platform !== 'unknown' ? parsed.platform : detectedPlatform
       const links = /^https?:\/\//.test(handleInput.trim()) ? [handleInput.trim()] : []
+
+      // 1. Try real metric search first
+      let realMetrics: any = null
+      try {
+        const metricRes = await fetchSocialMetrics(parsed.handle, platformToSave)
+        if (metricRes && metricRes.success) {
+          realMetrics = metricRes
+          setIsRealSource(metricRes.is_real_api)
+        }
+      } catch {
+        /* intentionally ignored */
+      }
+
+      // 2. Save lead in backend
       const res = await createLead(parsed.handle, links, platformToSave)
 
       // Save lead token in localStorage so signup can associate it
@@ -77,10 +97,25 @@ export default function Landing() {
         localStorage.setItem('lead_token', res.id)
       }
 
+      // Combine real metrics or fallback
+      const effectivePreview: LeadPreview = realMetrics
+        ? {
+            title: realMetrics.is_real_api
+              ? `Diagnóstico Oficial de @${parsed.handle} ⚡`
+              : res.preview.title,
+            summary: `Encontramos ${realMetrics.followers.toLocaleString('pt-BR')} seguidores e engajamento médio de ${realMetrics.avg_engagement}!`,
+            metrics: realMetrics.metrics,
+            insights: realMetrics.insights || res.preview.insights,
+            note: realMetrics.is_real_api
+              ? 'Conexão oficial validada! Liberamos o plano de ação e roteiros com inteligência artificial.'
+              : res.preview.note,
+          }
+        : res.preview
+
       setPreviewData({
         handle: parsed.handle,
         platform: platformToSave,
-        preview: res.preview,
+        preview: effectivePreview,
       })
 
       setTimeout(() => {
@@ -90,6 +125,23 @@ export default function Landing() {
       setError('Ops! Não foi possível gerar os dados no momento. Tente novamente! 😅')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleQuickSocialAuth = async (provider: string) => {
+    setSocialLoading(provider)
+    try {
+      const res = await signInWith(provider)
+      if (res.error) {
+        navigate('/signup')
+      } else {
+        toast({ title: 'Login realizado com sucesso! 🎉' })
+        navigate('/')
+      }
+    } catch {
+      navigate('/signup')
+    } finally {
+      setSocialLoading(null)
     }
   }
 
@@ -172,6 +224,45 @@ export default function Landing() {
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-violet-500" />
                 <span>Resultado em 3 segundos</span>
+              </div>
+            </div>
+
+            {/* Social Login Shortcut on Hero */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2 border-t border-border/40">
+              <span className="text-[11px] text-muted-foreground font-semibold">
+                Ou acesse direto com sua rede:
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={socialLoading !== null}
+                  onClick={() => handleQuickSocialAuth('google')}
+                  className="h-8 px-3 text-[11px] font-bold border rounded-lg gap-1.5 hover:bg-muted"
+                >
+                  <img
+                    src="https://img.usecurling.com/i?q=google"
+                    alt="Google"
+                    className="w-3.5 h-3.5"
+                  />
+                  <span>Google</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={socialLoading !== null}
+                  onClick={() => handleQuickSocialAuth('instagram')}
+                  className="h-8 px-3 text-[11px] font-bold border rounded-lg gap-1.5 text-pink-600 hover:bg-muted"
+                >
+                  <img
+                    src="https://img.usecurling.com/i?q=instagram"
+                    alt="Instagram"
+                    className="w-3.5 h-3.5"
+                  />
+                  <span>Instagram</span>
+                </Button>
               </div>
             </div>
           </div>
@@ -710,19 +801,15 @@ export default function Landing() {
               <Link to="/signup" className="hover:text-foreground transition-colors">
                 Cadastre-se Grátis
               </Link>
-              <a
-                href="#planos"
-                onClick={(e) => {
-                  e.preventDefault()
-                  alert('Plano Pro por R$ 49/mês disponível após os 7 dias grátis!')
-                }}
+              <Link
+                to="/plans"
                 className="hover:text-foreground transition-colors flex items-center gap-1"
               >
-                <span>Planos</span>
-                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">
-                  Em breve
+                <span>Planos & Preços</span>
+                <span className="text-[10px] bg-emerald-500/15 text-emerald-600 px-1.5 py-0.5 rounded font-bold">
+                  7 Dias Grátis
                 </span>
-              </a>
+              </Link>
               <a
                 href="mailto:contato@viralmetrics.ai"
                 className="hover:text-foreground transition-colors"

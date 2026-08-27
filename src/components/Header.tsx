@@ -22,7 +22,10 @@ export function Header() {
 
   const isAgency = user?.role === 'agency'
   const navItems = isAgency
-    ? [{ label: 'Agência', path: '/agencia', icon: Users }]
+    ? [
+        { label: 'Agência', path: '/agencia', icon: Users },
+        { label: 'Planos', path: '/plans', icon: Sparkles },
+      ]
     : [
         { label: 'Início', path: '/', icon: BarChart3 },
         { label: 'Snapshot', path: '/snapshot', icon: Camera },
@@ -32,6 +35,7 @@ export function Header() {
         { label: 'Concorrentes', path: '/concorrentes', icon: Crosshair },
         { label: 'Plano', path: '/plano', icon: Target },
         { label: 'Portal', path: '/portal', icon: Inbox },
+        { label: 'Planos', path: '/plans', icon: Flame },
         { label: 'IA', path: '/chat', icon: MessageSquare },
       ]
 
@@ -73,6 +77,16 @@ export function Header() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
+              <Link to="/plans" className="hidden sm:inline-flex">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs font-bold gap-1 border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                >
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  <span>Planos</span>
+                </Button>
+              </Link>
               <div className="hidden lg:flex items-center gap-2 text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full border">
                 <User className="w-3.5 h-3.5 text-primary" />
                 <span className="max-w-[120px] truncate">{user?.name || user?.email}</span>
@@ -89,6 +103,15 @@ export function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
+              <Link to="/plans" className="hidden sm:inline-flex">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+                >
+                  Planos
+                </Button>
+              </Link>
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-xs font-semibold">
                   Entrar

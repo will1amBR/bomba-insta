@@ -42,6 +42,17 @@ export default function Signup() {
           variant: 'destructive',
         })
       } else {
+        // Check if there is a lead token in localStorage and link it
+        const leadToken = localStorage.getItem('lead_token')
+        if (leadToken) {
+          try {
+            const { linkLead } = await import('@/services/leads')
+            await linkLead(leadToken)
+            localStorage.removeItem('lead_token')
+          } catch (err) {
+            console.error('Failed to link lead:', err)
+          }
+        }
         toast({ title: 'Conta criada! Bem-vindo! 🎉' })
         navigate('/')
       }

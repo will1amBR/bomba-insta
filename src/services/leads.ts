@@ -1,7 +1,17 @@
 import pb from '@/lib/pocketbase/client'
 
+export interface LeadMetrics {
+  followers: number
+  postsCount: number
+  avgEngagement: string
+  viralPotential: string
+  hookRetention: string
+}
+
 export interface LeadPreview {
   title: string
+  summary?: string
+  metrics?: LeadMetrics
   insights: string[]
   note: string
 }
@@ -9,13 +19,18 @@ export interface LeadPreview {
 export interface CreateLeadResponse {
   id: string
   handle: string
+  platform?: string
   preview: LeadPreview
 }
 
-export const createLead = async (handle: string, links: string[]): Promise<CreateLeadResponse> => {
+export const createLead = async (
+  handle: string,
+  links: string[] = [],
+  platform: string = 'instagram',
+): Promise<CreateLeadResponse> => {
   return pb.send('/backend/v1/leads', {
     method: 'POST',
-    body: JSON.stringify({ handle, links }),
+    body: JSON.stringify({ handle, links, platform }),
     headers: { 'Content-Type': 'application/json' },
   })
 }

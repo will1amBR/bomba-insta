@@ -9,9 +9,13 @@ export interface SmartInputResult {
 
 export function detectPlatform(input: string): DetectedPlatform {
   const lower = input.toLowerCase().trim()
-  if (lower.includes('instagram.com') || lower.includes('insta')) return 'instagram'
-  if (lower.includes('tiktok.com')) return 'tiktok'
+  if (lower.includes('instagram.com') || lower.includes('instagr.am') || lower.includes('ig.me'))
+    return 'instagram'
+  if (lower.includes('tiktok.com') || lower.includes('vm.tiktok.com')) return 'tiktok'
   if (lower.includes('youtube.com') || lower.includes('youtu.be')) return 'youtube_shorts'
+  if (lower.startsWith('ig:') || lower.startsWith('insta:')) return 'instagram'
+  if (lower.startsWith('tt:') || lower.startsWith('tiktok:')) return 'tiktok'
+  if (lower.startsWith('yt:') || lower.startsWith('youtube:')) return 'youtube_shorts'
   return 'unknown'
 }
 
@@ -47,22 +51,29 @@ export function parseSmartInput(input: string): SmartInputResult {
     const handle = normalizeHandle(trimmed)
     return {
       platform: platform === 'unknown' ? 'instagram' : platform,
-      handle,
+      handle: `@${handle}`,
       normalizedUrl: handle,
       isValid: handle.length > 0,
     }
   }
 
   if (/^https?:\/\//.test(trimmed)) {
-    const handle = extractHandleFromUrl(trimmed, platform)
-    return { platform, handle, normalizedUrl: trimmed, isValid: true }
+    const detectedPlat = platform === 'unknown' ? 'instagram' : platform
+    const handle = extractHandleFromUrl(trimmed, detectedPlat)
+    return {
+      platform: detectedPlat,
+      handle: handle ? (handle.startsWith('@') ? handle : `@${handle}`) : trimmed,
+      normalizedUrl: trimmed,
+      isValid: true,
+    }
   }
 
+  const cleanHandle = normalizeHandle(trimmed)
   return {
     platform: platform === 'unknown' ? 'instagram' : platform,
-    handle: normalizeHandle(trimmed),
-    normalizedUrl: normalizeHandle(trimmed),
-    isValid: trimmed.length > 0,
+    handle: cleanHandle ? `@${cleanHandle}` : '',
+    normalizedUrl: cleanHandle,
+    isValid: cleanHandle.length > 0,
   }
 }
 

@@ -35,26 +35,31 @@ export function SmartHandleInput({ value, onChange, placeholder }: SmartHandleIn
   const isLink = /^https?:\/\//.test(value)
 
   return (
-    <div className="relative">
-      {isLink ? (
-        <Link2 className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
-      ) : (
-        <PlatformIcon className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
-      )}
+    <div className="relative w-full">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground flex items-center">
+        {isLink ? (
+          <Link2 className="w-5 h-5 text-primary" />
+        ) : (
+          <PlatformIcon className="w-5 h-5 text-primary" />
+        )}
+      </div>
       <Input
         type="text"
         value={value}
         onChange={handleChange}
-        placeholder={placeholder || '@usuario ou https://...'}
-        className="pl-9 pr-20"
+        placeholder={placeholder || '@seu_perfil ou link do instagram/tiktok/youtube...'}
+        className="pl-11 pr-28 h-13 text-base shadow-inner border-2 border-primary/20 focus-visible:border-primary transition-all rounded-xl"
       />
       {detected !== 'unknown' && (
-        <Badge
-          variant="outline"
-          className={`absolute right-2 top-1.5 text-[10px] ${platformColors[detected]}`}
-        >
-          {platformLabels[detected]}
-        </Badge>
+        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
+          <Badge
+            variant="outline"
+            className={`text-xs font-semibold px-2.5 py-0.5 rounded-md flex items-center gap-1 shadow-sm ${platformColors[detected]}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+            {platformLabels[detected]}
+          </Badge>
+        </div>
       )}
     </div>
   )

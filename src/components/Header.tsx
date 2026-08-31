@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
+import { NotificationsDropdown } from '@/components/NotificationsDropdown'
 import {
   BarChart3,
   Flame,
@@ -77,6 +78,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
+              <NotificationsDropdown />
               <Link to="/plans" className="hidden sm:inline-flex">
                 <Button
                   variant="outline"

@@ -24,10 +24,14 @@ import { toast } from '@/hooks/use-toast'
 import { useRealtime } from '@/hooks/use-realtime'
 import { Crosshair, PlusCircle, Trash2, Eye, ExternalLink, Sparkles } from 'lucide-react'
 import { getCompetitorInsights } from '@/services/competitors'
+import { CompetitorComparison } from '@/components/CompetitorComparison'
+import { getContents } from '@/services/contents'
+import type { ContentRecord } from '@/types/content'
 
 export default function Competitors() {
   const [competitors, setCompetitors] = useState<CompetitorRecord[]>([])
   const [insights, setInsights] = useState<CompetitorInsightRecord[]>([])
+  const [contents, setContents] = useState<ContentRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState({
@@ -41,9 +45,14 @@ export default function Competitors() {
   const loadData = async () => {
     try {
       setLoading(true)
-      const [comps, ins] = await Promise.all([getCompetitors(), getCompetitorInsights()])
+      const [comps, ins, conts] = await Promise.all([
+        getCompetitors(),
+        getCompetitorInsights(),
+        getContents(),
+      ])
       setCompetitors(comps)
       setInsights(ins)
+      setContents(conts)
     } catch (err) {
       console.error(err)
     } finally {
@@ -164,6 +173,17 @@ export default function Competitors() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Side-by-side comparison table directly in Competitors page */}
+      {competitors.length > 0 && (
+        <div className="mt-4">
+          <CompetitorComparison
+            userContents={contents}
+            competitors={competitors}
+            competitorInsights={insights}
+          />
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-12 text-muted-foreground text-sm">Carregando...</div>

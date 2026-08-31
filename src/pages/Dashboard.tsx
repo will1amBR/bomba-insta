@@ -8,6 +8,7 @@ import { AddContentModal } from '@/components/AddContentModal'
 import { ViralMetricsChart } from '@/components/ViralMetricsChart'
 import { ActionPlanProgress } from '@/components/ActionPlanProgress'
 import { CompetitorRadar } from '@/components/CompetitorRadar'
+import { CompetitorComparison } from '@/components/CompetitorComparison'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -18,12 +19,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Flame, TrendingUp, Sparkles, Zap, RefreshCw } from 'lucide-react'
+import { Flame, TrendingUp, Sparkles, Zap, RefreshCw, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { TrialBanner } from '@/components/TrialBanner'
 import { SocialAccountsConnector } from '@/components/SocialAccountsConnector'
+import { generateReportPdf } from '@/lib/pdf-generator'
+import { useAuth } from '@/hooks/use-auth'
 
 export default function Dashboard() {
+  const { user } = useAuth()
   const [contents, setContents] = useState<ContentRecord[]>([])
   const [actionPlan, setActionPlan] = useState<ActionPlanRecord | null>(null)
   const [competitors, setCompetitors] = useState<CompetitorRecord[]>([])
@@ -97,7 +101,22 @@ export default function Dashboard() {
             Bora ver o que tá bombando e o que dá pra melhorar 🚀
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() =>
+              generateReportPdf({
+                userName: user?.name || 'Creator',
+                userEmail: user?.email || '',
+                contents,
+                competitors,
+                actionPlan,
+              })
+            }
+            className="gap-2 text-xs font-semibold border-primary/30 hover:bg-primary/10"
+          >
+            <Download className="w-4 h-4 text-primary" /> Exportar PDF 📄
+          </Button>
           <Link to="/analise">
             <Button variant="outline" className="gap-2 text-xs font-semibold">
               <Zap className="w-4 h-4 text-amber-500" /> Diagnóstico IA
@@ -144,6 +163,11 @@ export default function Dashboard() {
 
       {/* Real Social API Connection */}
       <SocialAccountsConnector onUpdate={loadData} />
+
+      {/* Side-by-side Competitor Comparison Table */}
+      {competitors.length > 0 && contents.length > 0 && (
+        <CompetitorComparison userContents={contents} competitors={competitors} />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ActionPlanProgress plan={actionPlan} />

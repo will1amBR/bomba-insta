@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T16:54:41.506Z",
+  "generatedAt": "2026-08-31T15:27:08.017Z",
   "collections": [
     {
       "name": "users",
@@ -1222,6 +1222,281 @@
       "indexes": [
         "CREATE INDEX idx_social_tokens_user ON social_tokens (user_id)",
         "CREATE INDEX idx_social_tokens_platform ON social_tokens (platform)"
+      ]
+    },
+    {
+      "name": "notifications",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "type",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "briefing_new",
+            "deliverable_submitted",
+            "deliverable_status",
+            "system",
+            "comparison_alert"
+          ]
+        },
+        {
+          "name": "read",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "link",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metadata",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_notifications_user_read ON notifications (user_id, read)",
+        "CREATE INDEX idx_notifications_user_created ON notifications (user_id, created DESC)"
+      ]
+    },
+    {
+      "name": "briefing_templates",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube_shorts", "all"]
+        },
+        {
+          "name": "content_type",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["video", "photo", "carousel"]
+        },
+        {
+          "name": "hook_suggestion",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cta_suggestion",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "visual_notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "estimated_days",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "is_preset",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_templates_category ON briefing_templates (category)",
+        "CREATE INDEX idx_templates_preset ON briefing_templates (is_preset)"
+      ]
+    },
+    {
+      "name": "dev_credentials",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user_id = @request.auth.id",
+        "view": "@request.auth.id != '' && user_id = @request.auth.id",
+        "create": "@request.auth.id != '' && user_id = @request.auth.id",
+        "update": "@request.auth.id != '' && user_id = @request.auth.id",
+        "delete": "@request.auth.id != '' && user_id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["instagram", "tiktok", "youtube", "meta"]
+        },
+        {
+          "name": "app_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "app_secret",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "api_key",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "webhook_verify_token",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": false,
+          "system": false,
+          "selectValues": ["configured", "pending", "inactive", "testing"]
+        },
+        {
+          "name": "quota_limit_daily",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "quota_used_today",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "metadata",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_dev_cred_user ON dev_credentials (user_id)",
+        "CREATE INDEX idx_dev_cred_platform ON dev_credentials (platform)"
       ]
     }
   ]

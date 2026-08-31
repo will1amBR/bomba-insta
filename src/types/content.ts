@@ -184,3 +184,59 @@ export interface DeliverableRecord {
   updated: string
   expand?: { briefing_id?: BriefingRecord }
 }
+
+export type NotificationType =
+  | 'briefing_new'
+  | 'deliverable_submitted'
+  | 'deliverable_status'
+  | 'system'
+  | 'comparison_alert'
+
+export interface NotificationRecord {
+  id: string
+  user_id: string
+  title: string
+  message: string
+  type: NotificationType
+  read: boolean
+  link?: string
+  metadata?: Record<string, any>
+  created: string
+  updated: string
+}
+
+export interface BriefingTemplateRecord {
+  id: string
+  user_id?: string
+  name: string
+  category: string
+  description?: string
+  platform: ContentPlatform | 'all'
+  content_type?: ContentType
+  hook_suggestion?: string
+  cta_suggestion?: string
+  visual_notes?: string
+  estimated_days?: number
+  is_preset?: boolean
+  created: string
+  updated: string
+}
+
+export type DevCredentialPlatform = 'instagram' | 'tiktok' | 'youtube' | 'meta'
+export type DevCredentialStatus = 'configured' | 'pending' | 'inactive' | 'testing'
+
+export interface DevCredentialRecord {
+  id: string
+  user_id: string
+  platform: DevCredentialPlatform
+  app_id?: string
+  app_secret?: string
+  api_key?: string
+  webhook_verify_token?: string
+  status: DevCredentialStatus
+  quota_limit_daily?: number
+  quota_used_today?: number
+  metadata?: Record<string, any>
+  created: string
+  updated: string
+}

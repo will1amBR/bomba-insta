@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { SubmitDeliverableDialog } from '@/components/SubmitDeliverableDialog'
 import { useAuth } from '@/hooks/use-auth'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Inbox, FileText, Package, ExternalLink, Check, Clock } from 'lucide-react'
+import { Inbox, FileText, Package, ExternalLink, Check, Clock, Download } from 'lucide-react'
+import { generateReportPdf } from '@/lib/pdf-generator'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   draft: { label: 'Rascunho', color: 'text-gray-500 bg-gray-500/10' },
@@ -58,29 +59,49 @@ export default function ClientPortal() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Briefings Ativos</p>
-                <p className="text-2xl font-extrabold text-primary">{activeBriefings.length}</p>
+      <div className="flex items-center justify-between">
+        <div className="grid grid-cols-2 gap-4 flex-1">
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Briefings Ativos</p>
+                  <p className="text-2xl font-extrabold text-primary">{activeBriefings.length}</p>
+                </div>
+                <FileText className="w-5 h-5 text-primary" />
               </div>
-              <FileText className="w-5 h-5 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground">Entregas Enviadas</p>
-                <p className="text-2xl font-extrabold text-violet-600">{deliverables.length}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Entregas Enviadas</p>
+                  <p className="text-2xl font-extrabold text-violet-600">{deliverables.length}</p>
+                </div>
+                <Package className="w-5 h-5 text-violet-500" />
               </div>
-              <Package className="w-5 h-5 text-violet-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            generateReportPdf({
+              userName: user?.name || 'Creator',
+              userEmail: user?.email || '',
+              contents: [],
+              competitors: [],
+            })
+          }
+          className="gap-1.5 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/10"
+        >
+          <Download className="w-4 h-4" /> Exportar Relatório em PDF
+        </Button>
       </div>
 
       <div className="space-y-4">

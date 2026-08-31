@@ -44,3 +44,19 @@ export const generateCompetitorInsights = async (competitorId: string) => {
     headers: { 'Content-Type': 'application/json' },
   })
 }
+
+export const checkCompetitorViralAlert = async (
+  competitorId: string,
+  data?: {
+    title?: string
+    hook_text?: string
+    views?: number
+    viral_score?: number
+  },
+) => {
+  return pb.send(`/backend/v1/competitors/${competitorId}/check-viral-alert`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data || {}),
+  })
+}

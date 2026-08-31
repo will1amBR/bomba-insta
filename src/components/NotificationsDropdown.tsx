@@ -9,7 +9,17 @@ import type { NotificationRecord } from '@/types/content'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Bell, Check, CheckCheck, FileText, Package, Sparkles, ExternalLink } from 'lucide-react'
+import {
+  Bell,
+  Check,
+  CheckCheck,
+  FileText,
+  Package,
+  Sparkles,
+  ExternalLink,
+  Flame,
+  AlertTriangle,
+} from 'lucide-react'
 
 export function NotificationsDropdown() {
   const [notifications, setNotifications] = useState<NotificationRecord[]>([])
@@ -71,13 +81,13 @@ export function NotificationsDropdown() {
   const getIcon = (type: string) => {
     switch (type) {
       case 'briefing_new':
-        return <FileText className="w-4 h-4 text-primary" />
+        return <FileText className="w-4 h-4 text-blue-500" />
       case 'deliverable_submitted':
         return <Package className="w-4 h-4 text-violet-500" />
       case 'deliverable_status':
         return <Check className="w-4 h-4 text-emerald-500" />
       case 'comparison_alert':
-        return <Sparkles className="w-4 h-4 text-amber-500" />
+        return <Flame className="w-4 h-4 text-amber-500 fill-amber-500/20" />
       default:
         return <Sparkles className="w-4 h-4 text-primary" />
     }
@@ -147,24 +157,39 @@ export function NotificationsDropdown() {
                   <div className="flex items-center justify-between gap-1">
                     <p
                       className={`text-xs truncate ${
-                        !n.read ? 'font-bold text-foreground' : 'text-foreground/90'
+                        !n.read ? 'font-bold text-foreground' : 'text-foreground/80'
                       }`}
                     >
                       {n.title}
                     </p>
                     <span className="text-[10px] text-muted-foreground flex-shrink-0">
-                      {new Date(n.created).toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                      })}
+                      {n.created
+                        ? new Date(n.created).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                          })
+                        : 'Hoje'}
                     </span>
                   </div>
                   <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                     {n.message}
                   </p>
+
+                  {/* Detalhes extras se for alerta de concorrente */}
+                  {n.type === 'comparison_alert' && n.metadata?.viral_score && (
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <span className="text-[10px] font-extrabold bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
+                        <Flame className="w-3 h-3 text-amber-500" /> Viral Score{' '}
+                        {n.metadata.viral_score}/100
+                      </span>
+                    </div>
+                  )}
+
                   {n.link && (
                     <div className="flex items-center gap-1 text-[10px] text-primary font-semibold pt-0.5">
-                      <span>Ver detalhes</span>
+                      <span>
+                        {n.type === 'comparison_alert' ? 'Espiar Concorrente 👀' : 'Ver detalhes'}
+                      </span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </div>
                   )}

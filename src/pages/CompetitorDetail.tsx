@@ -4,12 +4,13 @@ import {
   getCompetitor,
   getCompetitorInsight,
   generateCompetitorInsights,
+  checkCompetitorViralAlert,
 } from '@/services/competitors'
 import type { CompetitorRecord, CompetitorInsightRecord } from '@/types/content'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from '@/hooks/use-toast'
-import { ArrowLeft, Sparkles, Lightbulb, Layers, Zap, Cpu } from 'lucide-react'
+import { ArrowLeft, Sparkles, Lightbulb, Layers, Zap, Cpu, BellRing, Flame } from 'lucide-react'
 
 const platformLabels: Record<string, string> = {
   instagram: 'Instagram',
@@ -23,6 +24,33 @@ export default function CompetitorDetail() {
   const [insight, setInsight] = useState<CompetitorInsightRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [testingAlert, setTestingAlert] = useState(false)
+
+  const handleSimulateViralAlert = async () => {
+    if (!id) return
+    setTestingAlert(true)
+    try {
+      const res: any = await checkCompetitorViralAlert(id)
+      if (res.viral_detected) {
+        toast({
+          title: 'Alerta Viral Gerado! 🔥🚨',
+          description: `Novo post de ${competitor?.channel_name} detectado com Score ${res.viral_score}/100! Veja no sino de notificações.`,
+        })
+      } else {
+        toast({
+          title: 'Post monitorado',
+          description: 'Métricas abaixo do limiar viral de 80 pts.',
+        })
+      }
+    } catch {
+      toast({
+        title: 'Erro ao verificar alerta',
+        variant: 'destructive',
+      })
+    } finally {
+      setTestingAlert(false)
+    }
+  }
 
   const loadData = async () => {
     if (!id) return
@@ -96,21 +124,40 @@ export default function CompetitorDetail() {
             </p>
           )}
         </div>
-        <Button
-          onClick={handleGenerate}
-          disabled={generating}
-          className="gap-2 bg-secondary text-white"
-        >
-          {generating ? (
-            <>
-              <Cpu className="w-4 h-4 animate-spin" /> Analisando...
-            </>
-          ) : (
-            <>
-              <Zap className="w-4 h-4" /> Gerar Insights
-            </>
-          )}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleSimulateViralAlert}
+            disabled={testingAlert}
+            className="gap-1.5 border-amber-500/30 text-amber-600 hover:bg-amber-500/10 text-xs font-semibold"
+          >
+            {testingAlert ? (
+              <>
+                <Cpu className="w-3.5 h-3.5 animate-spin" /> Monitorando...
+              </>
+            ) : (
+              <>
+                <BellRing className="w-3.5 h-3.5 text-amber-500" /> Testar Alerta Viral 🔥
+              </>
+            )}
+          </Button>
+
+          <Button
+            onClick={handleGenerate}
+            disabled={generating}
+            className="gap-2 bg-secondary text-white text-xs"
+          >
+            {generating ? (
+              <>
+                <Cpu className="w-4 h-4 animate-spin" /> Analisando...
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4" /> Gerar Insights
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {insight ? (

@@ -187,24 +187,34 @@ export default function AgencyClientDetail() {
                       {statusConfig[d.status]?.label}
                     </Badge>
                   </div>
-                  {d.feedback && <p className="text-xs bg-muted/40 p-2 rounded">{d.feedback}</p>}
+                  {d.feedback && (
+                    <p className="text-xs bg-muted/40 p-2.5 rounded-lg border flex items-start gap-1.5 text-muted-foreground">
+                      <span className="font-semibold text-foreground">Feedback:</span> {d.feedback}
+                    </p>
+                  )}
                   {d.status === 'submitted' && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 pt-1">
                       <Button
                         size="sm"
-                        className="gap-1 bg-emerald-600 text-white"
+                        className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
                         onClick={() => handleApprove(d.id)}
                       >
-                        <Check className="w-3 h-3" /> Aprovar
+                        <Check className="w-3.5 h-3.5" /> Aprovar Entrega ✅
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        className="gap-1 text-rose-600"
+                        className="gap-1 text-rose-600 border-rose-200 hover:bg-rose-50 text-xs font-medium"
                         onClick={() => handleReject(d.id)}
                       >
-                        <X className="w-3 h-3" /> Rejeitar
+                        <X className="w-3.5 h-3.5" /> Solicitar Ajustes ⚠️
                       </Button>
+                    </div>
+                  )}
+                  {d.status === 'approved' && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      Entrega aprovada e pronta para veiculação! 🎉
                     </div>
                   )}
                 </CardContent>

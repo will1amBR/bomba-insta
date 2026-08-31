@@ -1,32 +1,71 @@
 import { useEffect, useState } from 'react'
 import { getBriefings } from '@/services/briefings'
-import { getDeliverables } from '@/services/deliverables'
+import { getDeliverables, updateDeliverable } from '@/services/deliverables'
 import type { BriefingRecord, DeliverableRecord } from '@/types/content'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { SubmitDeliverableDialog } from '@/components/SubmitDeliverableDialog'
 import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Inbox, FileText, Package, ExternalLink, Check, Clock, Download } from 'lucide-react'
+import {
+  Inbox,
+  FileText,
+  Package,
+  ExternalLink,
+  Check,
+  Clock,
+  Download,
+  CheckCircle,
+  RefreshCw,
+} from 'lucide-react'
 import { generateReportPdf } from '@/lib/pdf-generator'
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   draft: { label: 'Rascunho', color: 'text-gray-500 bg-gray-500/10' },
   sent: { label: 'Novo briefing! 📋', color: 'text-blue-500 bg-blue-500/10' },
-  in_progress: { label: 'Em producao', color: 'text-amber-500 bg-amber-500/10' },
+  in_progress: { label: 'Em produção', color: 'text-amber-500 bg-amber-500/10' },
   delivered: { label: 'Entregue', color: 'text-violet-500 bg-violet-500/10' },
-  approved: { label: 'Aprovado! 🎉', color: 'text-emerald-500 bg-emerald-500/10' },
-  submitted: { label: 'Enviado', color: 'text-blue-500 bg-blue-500/10' },
-  rejected: { label: 'Rejeitado', color: 'text-rose-500 bg-rose-500/10' },
+  approved: {
+    label: 'Aprovado! 🎉',
+    color: 'text-emerald-600 bg-emerald-500/15 border-emerald-500/30',
+  },
+  submitted: { label: 'Enviado / Em Análise ⏳', color: 'text-blue-500 bg-blue-500/10' },
+  rejected: { label: 'Revisão Solicitada ⚠️', color: 'text-rose-500 bg-rose-500/10' },
   pending: { label: 'Pendente', color: 'text-gray-500 bg-gray-500/10' },
 }
 
 export default function ClientPortal() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [briefings, setBriefings] = useState<BriefingRecord[]>([])
   const [deliverables, setDeliverables] = useState<DeliverableRecord[]>([])
+  const [approvingId, setApprovingId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const handleApproveDeliverable = async (deliverableId: string, title: string) => {
+    try {
+      setApprovingId(deliverableId)
+      await updateDeliverable(deliverableId, {
+        status: 'approved',
+        feedback: 'Aprovado pelo cliente! 🎉 Prontinho para publicação.',
+      })
+      toast({
+        title: 'Entrega Aprovada! 🎉✅',
+        description: `A entrega "${title}" foi aprovada e a agência já foi notificada!`,
+      })
+      loadData()
+    } catch (err) {
+      toast({
+        title: 'Erro ao aprovar',
+        description: 'Não foi possível aprovar a entrega. Tente novamente.',
+        variant: 'destructive',
+      })
+    } finally {
+      setApprovingId(null)
+    }
+  }
 
   const loadData = async () => {
     try {
@@ -149,31 +188,74 @@ export default function ClientPortal() {
                       </p>
                     )}
                     {del ? (
-                      <div className="flex items-center justify-between pt-1">
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] ${statusConfig[del.status]?.color}`}
-                        >
-                          {statusConfig[del.status]?.label}
-                        </Badge>
-                        {del.link && (
-                          <a
-                            href={del.link}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-xs text-primary underline flex items-center gap-1"
+                      <div className="space-y-2 pt-1 border-t border-border/50">
+                        <div className="flex items-center justify-between">
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] ${statusConfig[del.status]?.color}`}
                           >
-                            <ExternalLink className="w-3 h-3" /> Ver
-                          </a>
+                            {statusConfig[del.status]?.label}
+                          </Badge>
+                          {del.link && (
+                            <a
+                              href={del.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-primary underline flex items-center gap-1 hover:text-primary/80 font-medium"
+                            >
+                              <ExternalLink className="w-3 h-3" /> Ver Conteúdo
+                            </a>
+                          )}
+                        </div>
+
+                        {/* Botão de Aprovação de Entrega para o Cliente */}
+                        {del.status !== 'approved' && (
+                          <div className="bg-muted/40 p-2.5 rounded-lg border flex flex-col sm:flex-row items-center justify-between gap-2 mt-2">
+                            <div className="text-left w-full sm:w-auto">
+                              <p className="text-xs font-semibold text-foreground flex items-center gap-1">
+                                <span>Aprovação da Entrega</span>
+                              </p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {del.status === 'submitted'
+                                  ? 'Conteúdo enviado! Você pode aprovar a entrega final.'
+                                  : 'Aguardando validação ou ajustes.'}
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handleApproveDeliverable(del.id, del.title)}
+                              disabled={approvingId === del.id}
+                              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold gap-1.5 shadow-sm"
+                            >
+                              {approvingId === del.id ? (
+                                <>
+                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Aprovando...
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="w-3.5 h-3.5" /> Aprovar Entrega ✅
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        )}
+
+                        {del.status === 'approved' && (
+                          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 p-2.5 rounded-lg flex items-center gap-2 text-xs font-medium">
+                            <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                            <span>Entrega 100% aprovada e validada para publicação! 🚀🎉</span>
+                          </div>
                         )}
                       </div>
-                    ) : b.status === 'sent' ? (
-                      <SubmitDeliverableDialog briefing={b} onSuccess={loadData} />
+                    ) : b.status === 'sent' || b.status === 'in_progress' ? (
+                      <div className="pt-2">
+                        <SubmitDeliverableDialog briefing={b} onSuccess={loadData} />
+                      </div>
                     ) : null}
-                    {del?.feedback && (
-                      <p className="text-xs bg-emerald-500/5 p-2 rounded flex items-start gap-1">
-                        <Check className="w-3 h-3 text-emerald-500 mt-0.5" />
-                        {del.feedback}
+                    {del?.feedback && del.status !== 'approved' && (
+                      <p className="text-xs bg-muted/50 p-2 rounded flex items-start gap-1 text-muted-foreground">
+                        <Check className="w-3 h-3 text-primary mt-0.5" />
+                        Feedback: {del.feedback}
                       </p>
                     )}
                   </CardContent>

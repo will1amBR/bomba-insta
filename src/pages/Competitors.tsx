@@ -75,7 +75,10 @@ export default function Competitors() {
     }
     try {
       await createCompetitor(form)
-      toast({ title: 'Concorrente adicionado! 🎯' })
+      toast({
+        title: 'Concorrente adicionado! 🎯 Radar ativado 🔥',
+        description: 'Monitorando novos conteúdos e posts virais em tempo real!',
+      })
       setOpen(false)
       setForm({ channel_name: '', handle: '', platform: 'instagram', niche: '', notes: '' })
       loadData()

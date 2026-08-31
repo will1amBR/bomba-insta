@@ -71,7 +71,13 @@ routerAdd(
 
     return e.json(200, {
       id: record.id,
-      ...parsed,
+      title: parsed.title,
+      hook_headline: parsed.hook_headline,
+      body_outline: parsed.body_outline,
+      cta: parsed.cta,
+      visual_notes: parsed.visual_notes,
+      estimated_duration: parsed.estimated_duration,
+      viral_potential_score: parsed.viral_potential_score,
     })
   },
   $apis.requireAuth(),

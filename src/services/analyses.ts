@@ -4,6 +4,7 @@ import type { AnalysisRecord } from '@/types/content'
 export const getAnalyses = async (): Promise<AnalysisRecord[]> => {
   return pb.collection('analyses').getFullList<AnalysisRecord>({
     sort: '-created',
+    expand: 'content_id,compared_content_id',
   })
 }
 

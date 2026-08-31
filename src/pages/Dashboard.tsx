@@ -102,6 +102,14 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Link to="/nicho">
+            <Button
+              variant="outline"
+              className="gap-1.5 text-xs font-semibold border-primary/30 hover:bg-primary/10 text-primary"
+            >
+              <TrendingUp className="w-4 h-4 text-primary" /> Média do Nicho 📊
+            </Button>
+          </Link>
           <Button
             variant="outline"
             onClick={() =>

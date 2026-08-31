@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getCreators, type CreatorRecord } from '@/services/agency'
+import { getCreators } from '@/services/agency'
 import { getBriefings } from '@/services/briefings'
-import { getDeliverables } from '@/services/deliverables'
+import { getDeliverables, updateDeliverable } from '@/services/deliverables'
+import type { CreatorRecord, BriefingRecord, DeliverableRecord } from '@/types/content'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { AgencyPendingApprovals } from '@/components/AgencyPendingApprovals'
+import { toast } from '@/hooks/use-toast'
 import { useRealtime } from '@/hooks/use-realtime'
-import { Users, FileText, Package, ArrowRight, Search } from 'lucide-react'
+import { Users, FileText, Package, ArrowRight, Search, BarChart3, Sparkles } from 'lucide-react'
 
 export default function AgencyDashboard() {
   const [creators, setCreators] = useState<CreatorRecord[]>([])
-  const [briefings, setBriefings] = useState<any[]>([])
-  const [deliverables, setDeliverables] = useState<any[]>([])
+  const [briefings, setBriefings] = useState<BriefingRecord[]>([])
+  const [deliverables, setDeliverables] = useState<DeliverableRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
@@ -23,13 +26,53 @@ export default function AgencyDashboard() {
         getBriefings(),
         getDeliverables(),
       ])
-      setCreators(creatorsData)
+      setCreators(creatorsData as CreatorRecord[])
       setBriefings(briefingsData)
       setDeliverables(deliverablesData)
     } catch (err) {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleApproveDeliverable = async (delId: string) => {
+    try {
+      await updateDeliverable(delId, {
+        status: 'approved',
+        feedback: 'Aprovado pela agência! 🎉 Pronto para publicação.',
+      })
+      toast({
+        title: 'Entrega Aprovada! ✅',
+        description: 'Status atualizado com sucesso e notificação enviada.',
+      })
+      await loadData()
+    } catch (err) {
+      toast({
+        title: 'Erro ao aprovar',
+        description: 'Não foi possível aprovar a entrega. Tente novamente.',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const handleRejectDeliverable = async (delId: string) => {
+    try {
+      await updateDeliverable(delId, {
+        status: 'rejected',
+        feedback: 'Revisão necessária. Favor verificar os apontamentos.',
+      })
+      toast({
+        title: 'Ajustes Solicitados ⚠️',
+        description: 'O criador foi informado sobre as alterações necessárias.',
+        variant: 'destructive',
+      })
+      await loadData()
+    } catch (err) {
+      toast({
+        title: 'Erro ao solicitar ajustes',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -45,56 +88,86 @@ export default function AgencyDashboard() {
       c.email?.toLowerCase().includes(search.toLowerCase()),
   )
 
-  const pendingDeliverables = deliverables.filter((d) => d.status === 'submitted')
+  const pendingDeliverables = deliverables.filter(
+    (d) => d.status === 'submitted' || d.status === 'pending',
+  )
 
   return (
     <div className="container mx-auto py-6 px-4 space-y-6 max-w-5xl">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
-          <Users className="w-7 h-7 text-primary" /> Portal da Agência 🏢
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Gerencie seus influencers, briefings e entregas num so lugar 🚀
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+            <Users className="w-7 h-7 text-primary" /> Portal da Agência 🏢
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Gerencie seus influencers, aprovações de entregas e relatórios de nicho 🚀
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link to="/nicho">
+            <Button
+              variant="outline"
+              className="gap-1.5 text-xs font-semibold border-violet-500/30 text-violet-600 hover:bg-violet-500/10"
+            >
+              <BarChart3 className="w-4 h-4 text-violet-500" /> Relatório por Nicho 📊
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="hover:shadow-subtle transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Influencers</p>
-                <p className="text-2xl font-extrabold">{creators.length}</p>
+                <p className="text-xs text-muted-foreground font-medium">Influencers Ativos</p>
+                <p className="text-2xl font-extrabold text-foreground">{creators.length}</p>
               </div>
-              <Users className="w-5 h-5 text-primary" />
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <Users className="w-5 h-5" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-subtle transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Briefings</p>
-                <p className="text-2xl font-extrabold">{briefings.length}</p>
+                <p className="text-xs text-muted-foreground font-medium">Total de Briefings</p>
+                <p className="text-2xl font-extrabold text-violet-600">{briefings.length}</p>
               </div>
-              <FileText className="w-5 h-5 text-violet-500" />
+              <div className="w-9 h-9 rounded-lg bg-violet-500/10 text-violet-500 flex items-center justify-center">
+                <FileText className="w-5 h-5" />
+              </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-subtle transition-shadow border-amber-500/30 bg-amber-500/[0.03]">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-muted-foreground">Entregas Pendentes</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400 font-semibold">
+                  Aprovações Pendentes
+                </p>
                 <p className="text-2xl font-extrabold text-amber-600">
                   {pendingDeliverables.length}
                 </p>
               </div>
-              <Package className="w-5 h-5 text-amber-500" />
+              <div className="w-9 h-9 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center">
+                <Package className="w-5 h-5" />
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Seção 1: Resumo e Lista de Aprovações Pendentes da Agência */}
+      <AgencyPendingApprovals
+        deliverables={deliverables}
+        creators={creators}
+        onApprove={handleApproveDeliverable}
+        onReject={handleRejectDeliverable}
+      />
 
       <div className="flex items-center gap-2">
         <div className="relative flex-1">

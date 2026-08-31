@@ -4,7 +4,7 @@ import type { DeliverableRecord } from '@/types/content'
 export const getDeliverables = async (filter?: string): Promise<DeliverableRecord[]> => {
   return pb.collection('deliverables').getFullList<DeliverableRecord>({
     sort: '-created',
-    expand: 'briefing_id',
+    expand: 'briefing_id,influencer_id',
     filter: filter || undefined,
   })
 }

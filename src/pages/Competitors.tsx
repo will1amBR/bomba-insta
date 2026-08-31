@@ -109,72 +109,82 @@ export default function Competitors() {
             Espie o que os melhores estão fazendo e roube as ideias certas! 👀
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 bg-secondary text-white">
-              <PlusCircle className="w-4 h-4" /> Adicionar
+        <div className="flex items-center gap-2">
+          <Link to="/nicho">
+            <Button
+              variant="outline"
+              className="gap-1.5 text-xs font-semibold border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <Sparkles className="w-4 h-4" /> Relatório do Nicho 📊
             </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Novo Concorrente 🎯</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-3 text-sm">
-              <div>
-                <Label>Nome do Canal</Label>
-                <Input
-                  value={form.channel_name}
-                  onChange={(e) => setForm({ ...form, channel_name: e.target.value })}
-                  placeholder="Ex: Criativo MT"
-                  required
-                />
-              </div>
-              <div>
-                <Label>Handle</Label>
-                <Input
-                  value={form.handle}
-                  onChange={(e) => setForm({ ...form, handle: e.target.value })}
-                  placeholder="@usuario"
-                />
-              </div>
-              <div>
-                <Label>Plataforma</Label>
-                <Select
-                  value={form.platform}
-                  onValueChange={(v) => setForm({ ...form, platform: v as ContentPlatform })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="instagram">Instagram</SelectItem>
-                    <SelectItem value="tiktok">TikTok</SelectItem>
-                    <SelectItem value="youtube_shorts">YouTube Shorts</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Nicho</Label>
-                <Input
-                  value={form.niche}
-                  onChange={(e) => setForm({ ...form, niche: e.target.value })}
-                  placeholder="Ex: Marketing Digital"
-                />
-              </div>
-              <div>
-                <Label>Notas</Label>
-                <Input
-                  value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  placeholder="Observações sobre o canal"
-                />
-              </div>
-              <Button type="submit" className="w-full bg-secondary text-white">
-                Adicionar
+          </Link>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 bg-secondary text-white text-xs font-bold">
+                <PlusCircle className="w-4 h-4" /> Adicionar Concorrente
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Novo Concorrente 🎯</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCreate} className="space-y-3 text-sm">
+                <div>
+                  <Label>Nome do Canal</Label>
+                  <Input
+                    value={form.channel_name}
+                    onChange={(e) => setForm({ ...form, channel_name: e.target.value })}
+                    placeholder="Ex: Criativo MT"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Handle</Label>
+                  <Input
+                    value={form.handle}
+                    onChange={(e) => setForm({ ...form, handle: e.target.value })}
+                    placeholder="@usuario"
+                  />
+                </div>
+                <div>
+                  <Label>Plataforma</Label>
+                  <Select
+                    value={form.platform}
+                    onValueChange={(v) => setForm({ ...form, platform: v as ContentPlatform })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="instagram">Instagram</SelectItem>
+                      <SelectItem value="tiktok">TikTok</SelectItem>
+                      <SelectItem value="youtube_shorts">YouTube Shorts</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Nicho</Label>
+                  <Input
+                    value={form.niche}
+                    onChange={(e) => setForm({ ...form, niche: e.target.value })}
+                    placeholder="Ex: Marketing Digital"
+                  />
+                </div>
+                <div>
+                  <Label>Notas</Label>
+                  <Input
+                    value={form.notes}
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                    placeholder="Observações sobre o canal"
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-secondary text-white">
+                  Adicionar
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Side-by-side comparison table directly in Competitors page */}

@@ -25,16 +25,18 @@ export function Header() {
   const navItems = isAgency
     ? [
         { label: 'Agência', path: '/agencia', icon: Users },
+        { label: 'Relatório Nicho', path: '/nicho', icon: BarChart3 },
         { label: 'Planos', path: '/plans', icon: Sparkles },
       ]
     : [
         { label: 'Início', path: '/', icon: BarChart3 },
         { label: 'Snapshot', path: '/snapshot', icon: Camera },
         { label: 'Análise', path: '/analise', icon: Flame },
+        { label: 'Nicho', path: '/nicho', icon: Crosshair },
         { label: 'Roteiros', path: '/roteiros', icon: Sparkles },
         { label: 'Biblioteca', path: '/biblioteca', icon: Lightbulb },
-        { label: 'Concorrentes', path: '/concorrentes', icon: Crosshair },
-        { label: 'Plano', path: '/plano', icon: Target },
+        { label: 'Concorrentes', path: '/concorrentes', icon: Target },
+        { label: 'Plano', path: '/plano', icon: Lightbulb },
         { label: 'Portal', path: '/portal', icon: Inbox },
         { label: 'Planos', path: '/plans', icon: Flame },
         { label: 'IA', path: '/chat', icon: MessageSquare },

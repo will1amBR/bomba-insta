@@ -182,7 +182,21 @@ export interface DeliverableRecord {
   feedback?: string
   created: string
   updated: string
-  expand?: { briefing_id?: BriefingRecord }
+  expand?: {
+    briefing_id?: BriefingRecord
+    influencer_id?: { id: string; name?: string; email?: string; avatar?: string }
+  }
+}
+
+export interface CreatorRecord {
+  id: string
+  name: string
+  email: string
+  avatar?: string
+  trial_end?: string
+  role?: string
+  created: string
+  updated?: string
 }
 
 export type NotificationType =

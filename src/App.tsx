@@ -17,6 +17,7 @@ import ActionPlanPage from './pages/ActionPlanPage'
 import ClientPortal from './pages/ClientPortal'
 import AgencyDashboard from './pages/AgencyDashboard'
 import AgencyClientDetail from './pages/AgencyClientDetail'
+import NicheReport from './pages/NicheReport'
 import PlansPage from './pages/Plans'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/snapshot" element={<SocialSnapshot />} />
             <Route path="/concorrentes" element={<Competitors />} />
             <Route path="/concorrentes/:id" element={<CompetitorDetail />} />
+            <Route path="/nicho" element={<NicheReport />} />
             <Route path="/plano" element={<ActionPlanPage />} />
             <Route path="/portal" element={<ClientPortal />} />
             <Route path="/agencia" element={<AgencyDashboard />} />

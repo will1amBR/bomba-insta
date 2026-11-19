@@ -2,15 +2,17 @@
 // com a média do nicho (mesma lógica de src/services/niche-benchmark.ts) e cria
 // notificações do tipo "niche_alert" para métricas abaixo da média.
 // IMPORTANTE: sem spread operators (runtime Goja gera __spreadValues e quebra).
+// IMPORTANTE: e.next() em finally — todo hook é uma chain desde o PocketBase v0.23.
+// IMPORTANTE: toda a lógica inline no callback (sem funções top-level, exigência da JSVM).
 
 onRecordAfterCreateSuccess((e) => {
   const content = e.record
-  if (!content) return
-
-  const userId = content.getString('user_id')
-  if (!userId) return
-
   try {
+    if (!content) return
+
+    const userId = content.getString('user_id')
+    if (!userId) return
+
     // 1. Conteúdos do usuário (para as métricas do criador)
     const userContents = $app.findRecordsByFilter(
       'contents',
@@ -127,7 +129,7 @@ onRecordAfterCreateSuccess((e) => {
 
     // 5. Métricas abaixo da média (mesma régua do relatório: > 3% de diferença)
     const below = []
-    const check = (label, icon, uVal, nVal, unit) => {
+    const check = function (label, icon, uVal, nVal, unit) {
       if (nVal === 0) return
       const diffPct = Math.round(((uVal - nVal) / nVal) * 100)
       if (diffPct < -3) {
@@ -152,7 +154,7 @@ onRecordAfterCreateSuccess((e) => {
 
     if (below.length === 0) return
 
-    // 6. Dedup: se já existe alerta de nicho não lido nas últimas 24h, não repete
+    // 6. Dedup: se já existe alerta de nicho nas últimas 24h, não repete
     const recent = $app.findRecordsByFilter(
       'notifications',
       'user_id = "' + userId + '" && type = "niche_alert"',
@@ -204,6 +206,8 @@ onRecordAfterCreateSuccess((e) => {
       'Alerta de nicho criado para usuário ' + userId + ' (' + below.length + ' métricas abaixo)',
     )
   } catch (err) {
-    console.log('Erro ao criar alerta de nicho: ' + err)
+    console.log('Erro ao processar alerta de nicho: ' + err)
+  } finally {
+    e.next()
   }
 }, 'contents')

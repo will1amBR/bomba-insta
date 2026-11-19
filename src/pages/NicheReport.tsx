@@ -46,6 +46,7 @@ import {
 } from 'lucide-react'
 
 export default function NicheReport() {
+  const { user } = useAuth()
   const [contents, setContents] = useState<ContentRecord[]>([])
   const [competitors, setCompetitors] = useState<CompetitorRecord[]>([])
   const [insights, setInsights] = useState<CompetitorInsightRecord[]>([])

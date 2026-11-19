@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T17:16:52.666Z",
+  "generatedAt": "2026-11-19T04:00:48.870Z",
   "collections": [
     {
       "name": "users",
@@ -1264,7 +1264,8 @@
             "deliverable_submitted",
             "deliverable_status",
             "system",
-            "comparison_alert"
+            "comparison_alert",
+            "niche_alert"
           ]
         },
         {

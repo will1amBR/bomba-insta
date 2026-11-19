@@ -19,6 +19,7 @@ import {
   ExternalLink,
   Flame,
   AlertTriangle,
+  Target,
 } from 'lucide-react'
 
 export function NotificationsDropdown() {
@@ -88,6 +89,8 @@ export function NotificationsDropdown() {
         return <Check className="w-4 h-4 text-emerald-500" />
       case 'comparison_alert':
         return <Flame className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+      case 'niche_alert':
+        return <Target className="w-4 h-4 text-rose-500" />
       default:
         return <Sparkles className="w-4 h-4 text-primary" />
     }
@@ -185,10 +188,23 @@ export function NotificationsDropdown() {
                     </div>
                   )}
 
+                  {/* Badge para alerta de nicho */}
+                  {n.type === 'niche_alert' && (
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <span className="text-[10px] font-extrabold bg-rose-500/15 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full border border-rose-500/30 flex items-center gap-1">
+                        <Target className="w-3 h-3" /> Benchmark por Nicho
+                      </span>
+                    </div>
+                  )}
+
                   {n.link && (
                     <div className="flex items-center gap-1 text-[10px] text-primary font-semibold pt-0.5">
                       <span>
-                        {n.type === 'comparison_alert' ? 'Espiar Concorrente 👀' : 'Ver detalhes'}
+                        {n.type === 'comparison_alert'
+                          ? 'Espiar Concorrente 👀'
+                          : n.type === 'niche_alert'
+                            ? 'Abrir Relatório de Nicho 📊'
+                            : 'Ver detalhes'}
                       </span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </div>

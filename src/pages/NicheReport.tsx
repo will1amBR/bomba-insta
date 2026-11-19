@@ -17,6 +17,9 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useRealtime } from '@/hooks/use-realtime'
+import { useAuth } from '@/hooks/use-auth'
+import { generateNicheReportPdf } from '@/lib/niche-pdf-generator'
+import { Download } from 'lucide-react'
 import {
   TrendingUp,
   ArrowUpRight,
@@ -243,6 +246,20 @@ export default function NicheReport() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={loadData} className="gap-1 text-xs">
             <RefreshCw className="w-3.5 h-3.5" /> Atualizar Dados
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              generateNicheReportPdf({
+                benchmark,
+                userName: user?.name || 'Criador',
+                userEmail: user?.email || '',
+              })
+            }
+            className="gap-1.5 text-xs font-semibold border-primary/30 hover:bg-primary/10 text-primary"
+          >
+            <Download className="w-3.5 h-3.5 text-primary" /> Exportar PDF 📄
           </Button>
         </div>
       </div>

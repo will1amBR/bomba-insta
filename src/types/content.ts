@@ -205,6 +205,7 @@ export type NotificationType =
   | 'deliverable_status'
   | 'system'
   | 'comparison_alert'
+  | 'niche_alert'
 
 export interface NotificationRecord {
   id: string

@@ -113,10 +113,15 @@ export default function Analysis() {
       } catch {
         /* intentionally ignored */
       }
-    } catch (err) {
+    } catch (err: any) {
+      const detail =
+        err?.response?.message ||
+        err?.response?.data?.message ||
+        err?.message ||
+        'Não foi possível rodar o diagnóstico por IA. Tente novamente.'
       toast({
         title: 'Erro ao analisar',
-        description: 'Não foi possível rodar o diagnóstico por IA. Tente novamente.',
+        description: detail,
         variant: 'destructive',
       })
     } finally {
@@ -760,6 +765,24 @@ function AnalysisResultDisplay({
               </ul>
             </div>
           </div>
+
+          {/* Aviso de dados não verificados */}
+          {(result as any).has_real_data === false && (result as any).what_to_do?.length > 0 && (
+            <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl space-y-2">
+              <h4 className="font-bold text-amber-800 dark:text-amber-400 flex items-center gap-2 text-xs uppercase tracking-wider">
+                <AlertTriangle className="w-4 h-4" />
+                Para analisar vídeos reais, faça isto:
+              </h4>
+              <ul className="space-y-1.5 text-xs">
+                {(result as any).what_to_do.map((todo: string, idx: number) => (
+                  <li key={idx} className="flex items-start gap-2 text-foreground">
+                    <span className="font-bold text-amber-600">{idx + 1}.</span>
+                    <span>{todo}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Deep Diagnosis */}
           {result.engagement_diagnosis && (

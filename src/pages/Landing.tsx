@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { SmartHandleInput } from '@/components/SmartHandleInput'
 import { parseSmartInput, type DetectedPlatform } from '@/lib/smart-input'
 import { createLead, type LeadPreview } from '@/services/leads'
-import { fetchSocialMetrics } from '@/services/social-tokens'
+import { fetchSocialMetrics, type RealVideoMetrics } from '@/services/social-tokens'
 import { toast } from '@/hooks/use-toast'
 import {
   Flame,
@@ -36,6 +36,7 @@ import {
   Heart,
   Share2,
   MessageCircle,
+  AlertTriangle,
 } from 'lucide-react'
 
 export default function Landing() {
@@ -51,6 +52,8 @@ export default function Landing() {
     handle: string
     platform: string
     preview: LeadPreview
+    videos?: RealVideoMetrics[]
+    whatToDo?: string[]
   } | null>(null)
 
   const previewRef = useRef<HTMLDivElement>(null)
@@ -98,17 +101,22 @@ export default function Landing() {
       }
 
       // Combine real metrics or fallback
+      const hasRealVideos = realMetrics && realMetrics.has_real_data
       const effectivePreview: LeadPreview = realMetrics
         ? {
-            title: realMetrics.is_real_api
-              ? `Diagnóstico Oficial de @${parsed.handle} ⚡`
+            title: hasRealVideos
+              ? `Diagnóstico com vídeos reais de @${parsed.handle} ✅`
               : res.preview.title,
-            summary: `Encontramos ${realMetrics.followers.toLocaleString('pt-BR')} seguidores e engajamento médio de ${realMetrics.avg_engagement}!`,
+            summary: hasRealVideos
+              ? (realMetrics.data_note || 'Métricas extraídas de vídeos reais.') +
+                ` Engajamento médio: ${realMetrics.avg_engagement}.`
+              : res.preview.summary,
             metrics: realMetrics.metrics,
             insights: realMetrics.insights || res.preview.insights,
-            note: realMetrics.is_real_api
-              ? 'Conexão oficial validada! Liberamos o plano de ação e roteiros com inteligência artificial.'
-              : res.preview.note,
+            note:
+              hasRealVideos || realMetrics.is_real_api
+                ? realMetrics.data_note || 'Métricas obtidas de fonte real.'
+                : (realMetrics.what_to_do || []).join(' ') || res.preview.note,
           }
         : res.preview
 
@@ -116,6 +124,8 @@ export default function Landing() {
         handle: parsed.handle,
         platform: platformToSave,
         preview: effectivePreview,
+        videos: hasRealVideos ? realMetrics.videos || [] : [],
+        whatToDo: !hasRealVideos ? realMetrics?.what_to_do || [] : [],
       })
 
       setTimeout(() => {
@@ -382,6 +392,67 @@ export default function Landing() {
                     <Sparkles className="w-4 h-4 text-violet-600 flex-shrink-0" />
                     <span>{previewData.preview.note}</span>
                   </div>
+
+                  {/* Vídeos reais encontrados */}
+                  {previewData.videos && previewData.videos.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-violet-500" /> Vídeos reais verificados (
+                        {previewData.videos.length}):
+                      </h4>
+                      <div className="space-y-2">
+                        {previewData.videos.map((v) => (
+                          <div
+                            key={v.id}
+                            className="bg-muted/40 border border-border/70 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-xs sm:text-sm font-bold truncate">{v.title}</p>
+                              <p className="text-[11px] text-muted-foreground">
+                                {v.platform.toUpperCase()}
+                                {v.posting_date ? ` • ${v.posting_date.substring(0, 10)}` : ''}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs font-semibold flex-shrink-0">
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3.5 h-3.5 text-blue-500" />
+                                {v.views.toLocaleString('pt-BR')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Heart className="w-3.5 h-3.5 text-rose-500" />
+                                {v.likes.toLocaleString('pt-BR')}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MessageCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                {v.comments.toLocaleString('pt-BR')}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* O que fazer quando não há dados reais */}
+                  {previewData.whatToDo && previewData.whatToDo.length > 0 && (
+                    <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 space-y-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5" /> Para analisar vídeos reais, faça
+                        isto:
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {previewData.whatToDo.map((todo, idx) => (
+                          <li
+                            key={idx}
+                            className="text-xs sm:text-sm text-foreground flex items-start gap-2"
+                          >
+                            <span className="font-bold text-amber-600">{idx + 1}.</span>
+                            <span>{todo}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* High conversion CTA after preview */}
                   <div className="bg-gradient-to-br from-amber-500/10 via-rose-500/10 to-violet-500/10 p-6 rounded-2xl border-2 border-primary/20 text-center space-y-4">

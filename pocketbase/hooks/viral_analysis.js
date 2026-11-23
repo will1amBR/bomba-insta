@@ -39,6 +39,13 @@ routerAdd(
     const mainHookText = mainContent.getString('hook_text')
     const mainCaption = mainContent.getString('caption')
     const mainScore = mainContent.getInt('viral_score') || 75
+    const mainStatus = mainContent.getString('status')
+
+    // Verifica se o conteúdo tem métricas reais (qualquer número > 0 indica dado real cadastrado)
+    const hasRealMetrics = mainViews > 0 || mainLikes > 0 || mainComments > 0 || mainShares > 0
+    const sourceLabel = hasRealMetrics
+      ? 'conteúdo real cadastrado no painel (' + mainStatus + ')'
+      : 'métricas zeradas — sem dado real para análise'
 
     const promptPayload = {
       principal: {
@@ -136,14 +143,33 @@ routerAdd(
 
     $app.save(record)
 
-    return e.json(200, {
+    const resp = {
       id: record.id,
       summary: parsed.summary,
       positive_factors: parsed.positive_factors,
       negative_factors: parsed.negative_factors,
       engagement_diagnosis: parsed.engagement_diagnosis,
       virality_score: parsed.virality_score,
-    })
+      has_real_data: hasRealMetrics,
+      source: hasRealMetrics ? 'user_registered_contents' : 'no_real_data_available',
+    }
+
+    if (!hasRealMetrics) {
+      resp.what_to_do = [
+        'As métricas do conteúdo "' +
+          mainTitle +
+          '" estão zeradas (0 views/likes). Edite o conteúdo no Dashboard e preencha as métricas reais do vídeo.',
+        'Ou conecte sua conta do ' +
+          mainPlatform.toUpperCase() +
+          ' em Dashboard → Conexões de Redes Sociais para sincronizar as métricas automaticamente.',
+      ]
+      resp.summary = '⚠️ Sem dados reais: as métricas deste conteúdo estão zeradas. ' + resp.summary
+      resp.engagement_diagnosis =
+        '⚠️ Este diagnóstico foi gerado com base em métricas incompletas (zeros). Preencha as métricas reais do conteúdo no Dashboard e rode a análise novamente para um diagnóstico confiável.\n\n' +
+        resp.engagement_diagnosis
+    }
+
+    return e.json(200, resp)
   },
   $apis.requireAuth(),
 )

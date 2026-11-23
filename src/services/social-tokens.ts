@@ -12,6 +12,23 @@ export interface SocialTokenRecord {
   created?: string
 }
 
+export interface RealVideoMetrics {
+  id: string
+  title: string
+  platform: string
+  views: number
+  likes: number
+  comments: number
+  shares: number
+  retention_rate: number
+  hook_rate: number
+  viral_score: number
+  status: string
+  hook_text: string
+  posting_date: string
+  permalink?: string
+}
+
 export interface SocialMetricsResult {
   success: boolean
   is_real_api: boolean
@@ -31,6 +48,10 @@ export interface SocialMetricsResult {
     hookRetention: string
   }
   insights: string[]
+  videos?: RealVideoMetrics[]
+  has_real_data?: boolean
+  data_note?: string
+  what_to_do?: string[]
 }
 
 export const getMySocialTokens = async (): Promise<SocialTokenRecord[]> => {
